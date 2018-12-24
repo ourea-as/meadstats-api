@@ -3,8 +3,11 @@ from typing import Dict
 
 import requests
 
-logger = logging.getLogger('pyuntappd')
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger('untappd-api')
+
+gunicorn_logger = logging.getLogger('gunicorn.error')
+logger.handlers = gunicorn_logger.handlers
+logger.setLevel(gunicorn_logger.level)
 
 
 class UntappdAPI:
@@ -58,8 +61,6 @@ class UntappdAPI:
         response.raise_for_status()
         response_json = response.json()
         logger.info(f'Response JSON: {response_json}')
-
-        # TODO: Error handling
 
         untappd_access_token = response_json["response"]["access_token"]
         return untappd_access_token

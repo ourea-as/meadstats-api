@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify, redirect, make_response
 from flask_jwt_extended import (JWTManager, create_access_token, decode_token)
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from requests import HTTPError
 from sqlalchemy import func
 
 from .untappd_api import UntappdAPI
@@ -54,8 +55,13 @@ def create_app():
 
         # Send token to Untappd servers in order to obtain access token
         code = request.args.get('code')
-        untappd_access_token = untappd_api.authenticate(
-            code, f"{app.config['API_DOMAIN']}/auth_callback")
+
+        try:
+            untappd_access_token = untappd_api.authenticate(code, f"{app.config['API_DOMAIN']}/auth_callback")
+        except HTTPError as error:
+            app.logger.error(f"Authentication failed. HTTP Status code {error.response.status_code}. Headers: {error.response.headers}")
+            return jsonify({"status": "error", "code": error.response.status_code}), 500
+
         user = authenticate_user(untappd_access_token)
         access_token = create_access_token(identity=user.user_name)
 
@@ -535,9 +541,12 @@ def create_app():
         app.logger.info(f"SocketIO: Progress ({offset}/{beer_count})")
         socketio.sleep(0)
 
-        beers_add, _ = untappd_api.user_beers(
-            username, offset, 50, access_token)
-        beers = beers_add['items']
+        try:
+            beers_add, _ = untappd_api.user_beers(
+                username, offset, 50, access_token)
+            beers = beers_add['items']
+        except:
+            return False
 
         for raw_beer in beers:
             if not handle_beer(raw_beer, user):
