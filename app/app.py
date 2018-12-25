@@ -258,8 +258,8 @@ def create_app():
 
         return jsonify(data), 200
 
-    @app.route('/v1/users/<string:username>/countries/<string:country>')
-    def get_user_country(username: str, country: str):
+    @app.route('/v1/users/<string:username>/countries/<string:country_code>')
+    def get_user_country(username: str, country_code: str):
         # Breweries
         # - Count
         # - Location
@@ -275,6 +275,13 @@ def create_app():
 
         # Beer list
 
+        country_code = country_code.lower()
+
+        try:
+            country_name = pycountry.countries.get(alpha_2=country_code.upper()).name
+        except (AttributeError, KeyError):
+            return jsonify(data = {"status": "error", "message": "Country not found"}), 404
+
         user = get_user_from_db(username)
         checkins = Checkin.query.filter_by(user=user).options(
             db.joinedload(Checkin.beer).joinedload(Beer.brewery)).all()
@@ -284,7 +291,7 @@ def create_app():
         breweries = []
 
         for checkin in checkins:
-            if country.lower() != checkin.beer.brewery.country.lower():
+            if country_code != get_country_code(checkin.beer.brewery.country):
                 continue
 
             beer = checkin.beer
@@ -323,6 +330,8 @@ def create_app():
             "status": "success",
             "data": {
                 "count": count,
+                "code": country_code,
+                "name": country_name,
                 "averageRating": ratingSum / count,
                 "breweries": breweries
             }
@@ -366,8 +375,7 @@ def create_app():
 
         try:
             return pycountry.countries.get(name=country).alpha_2.lower()
-        except KeyError:
-
+        except (KeyError, AttributeError):
             app.logger.error(f'Missing code for country: {country}')
             return ""
 
