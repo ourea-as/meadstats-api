@@ -58,9 +58,9 @@ class UntappdAPI:
         }
 
         response = requests.get(access_token_url, params=payload)
-        response.raise_for_status()
         response_json = response.json()
         logger.info(f'Response JSON: {response_json}')
+        response.raise_for_status()
 
         untappd_access_token = response_json["response"]["access_token"]
         return untappd_access_token
