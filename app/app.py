@@ -260,21 +260,6 @@ def create_app():
 
     @app.route('/v1/users/<string:username>/countries/<string:country_code>')
     def get_user_country(username: str, country_code: str):
-        # Breweries
-        # - Count
-        # - Location
-        # - Average rating
-
-        # Venues
-        # - Count
-        # - Location
-
-        # Country
-        # - Total
-        # - Average rating
-
-        # Beer list
-
         country_code = country_code.lower()
 
         try:
@@ -287,7 +272,7 @@ def create_app():
             db.joinedload(Checkin.beer).joinedload(Beer.brewery)).all()
 
         count = 0
-        ratingSum = 0
+        ratings = []
         breweries = []
 
         for checkin in checkins:
@@ -297,34 +282,39 @@ def create_app():
             beer = checkin.beer
             brewery = beer.brewery
             count += 1
-            ratingSum += checkin.rating
+            ratings.append(checkin.rating)
+
+            beer = beer_schema.dump(beer, many=False)[0]
+            beer['userRating'] = checkin.rating
+            beer['firstHad'] = checkin.first_had
+            beer['count'] = checkin.count
 
             for x in breweries:
                 if x['id'] == brewery.id:
                     x['count'] += 1
-                    x['ratingSum'] += checkin.rating
-                    x['beers'].append(beer_schema.dump(beer, many=False)[0])
+                    x['ratings'].append(checkin.rating)
+                    x['beers'].append(beer)
                     break
             else:
                 x = {
                     'id': brewery.id,
                     'count': 1,
-                    'ratingSum': checkin.rating,
+                    'ratings': [checkin.rating],
                     'location': {
                         'lat': brewery.latitude,
                         'lon': brewery.longitude
                     },
                     'label': brewery.label,
                     'name': brewery.name,
-                    'beers': [beer_schema.dump(beer, many=False)[0]]
+                    'beers': [beer]
                 }
 
                 breweries.append(x)
 
         for brewery in breweries:
-            brewery['averageRating'] = brewery['ratingSum'] / brewery['count']
+            brewery['averageRating'] = safe_mean(brewery['ratings'])
 
-            del brewery['ratingSum']
+            del brewery['ratings']
 
         data = {
             "status": "success",
@@ -332,12 +322,15 @@ def create_app():
                 "count": count,
                 "code": country_code,
                 "name": country_name,
-                "averageRating": ratingSum / count,
+                "averageRating": safe_mean(ratings),
                 "breweries": breweries
             }
         }
 
         return jsonify(data), 200
+
+    def safe_mean(data):
+        return mean(data) if len(data) > 0 else 0
 
     # Needed to map some country names not adhering to ISO
     COUNTRY_CODE_MAPPING_TABLE = {
