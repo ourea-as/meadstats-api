@@ -330,6 +330,7 @@ def create_app():
         return jsonify(data), 200
 
     def safe_mean(data):
+        data = [x for x in data if x != 0]
         return mean(data) if len(data) > 0 else 0
 
     # Needed to map some country names not adhering to ISO
@@ -386,16 +387,16 @@ def create_app():
             for x in weekdays:
                 if x['weekday'] == weekday:
                     x['count'] += 1
-                    x['averageRating'] += rating
+                    x['ratings'].append(rating)
                     break
             else:
-                x = {'weekday': weekday, 'count': 1, 'averageRating': rating}
+                x = {'weekday': weekday, 'count': 1, 'ratings': [rating]}
 
                 weekdays.append(x)
 
         for weekday in weekdays:
-            weekday['averageRating'] = weekday['averageRating'] / \
-                weekday['count']
+            weekday['averageRating'] = safe_mean(weekday['ratings'])
+            del weekday['ratings']
 
         data = {
             "status": "success",
@@ -420,15 +421,16 @@ def create_app():
             for x in hours:
                 if x['hour'] == hour:
                     x['count'] += 1
-                    x['averageRating'] += rating
+                    x['ratings'].append(rating)
                     break
             else:
-                x = {'hour': hour, 'count': 1, 'averageRating': rating}
+                x = {'hour': hour, 'count': 1, 'ratings': [rating]}
 
                 hours.append(x)
 
         for hour in hours:
-            hour['averageRating'] = hour['averageRating'] / hour['count']
+            hour['averageRating'] = safe_mean(hour['ratings'])
+            del hour['ratings']
 
         data = {
             "status": "success",
@@ -453,15 +455,16 @@ def create_app():
             for x in months:
                 if x['month'] == month:
                     x['count'] += 1
-                    x['averageRating'] += rating
+                    x['ratings'].append(rating)
                     break
             else:
-                x = {'month': month, 'count': 1, 'averageRating': rating}
+                x = {'month': month, 'count': 1, 'ratings': [rating]}
 
                 months.append(x)
 
         for month in months:
-            month['averageRating'] = month['averageRating'] / month['count']
+            month['averageRating'] = safe_mean(month['ratings'])
+            del month['ratings']
 
         data = {
             "status": "success",
@@ -486,15 +489,16 @@ def create_app():
             for x in years:
                 if x['year'] == year:
                     x['count'] += 1
-                    x['averageRating'] += rating
+                    x['ratings'].append(rating)
                     break
             else:
-                x = {'year': year, 'count': 1, 'averageRating': rating}
+                x = {'year': year, 'count': 1, 'ratings': [rating]}
 
                 years.append(x)
 
         for year in years:
-            year['averageRating'] = year['averageRating'] / year['count']
+            year['averageRating'] = safe_mean(year['ratings'])
+            del year['ratings']
 
         data = {
             "status": "success",
