@@ -19,6 +19,7 @@ class UntappdAPI:
         self.endpoint = 'https://' + host + '/' + version + '/'
 
         self.session = requests.Session()
+        self.session.headers.update({'User-Agent': 'meadstats'})
 
     def _do_get(self, method: str, params: Dict = None, access_token: str = None):
         """
@@ -39,7 +40,7 @@ class UntappdAPI:
 
         logger.debug('Sending GET request to {}'.format(url))
 
-        response = requests.get(url, params=payload)
+        response = self.session.get(url, params=payload)
 
         logger.debug('Status code: {}'.format(response.status_code))
 
@@ -57,7 +58,7 @@ class UntappdAPI:
             'code': code
         }
 
-        response = requests.get(access_token_url, params=payload)
+        response = self.session.get(access_token_url, params=payload)
         response.raise_for_status()
         response_json = response.json()
         logger.info(f'Response JSON: {response_json}')
