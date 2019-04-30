@@ -522,6 +522,34 @@ def create_app():
 
         return jsonify(data), 200
 
+    @app.route('/v1/users/<string:username>/graph')
+    def get_graph_for_username(username: str):
+        user = get_user_from_db(username)
+        checkins = Checkin.query.filter_by(user=user).all()
+
+        dates = []
+
+        for checkin in checkins:
+            date = f'{checkin.first_had.year}/{checkin.first_had.month}/{checkin.first_had.day}'
+
+            for x in dates:
+                if x['date'] == date:
+                    x['count'] += 1
+                    break
+            else:
+                x = {'date': date, 'count': 1}
+
+                dates.append(x)
+
+        data = {
+            "status": "success",
+            "data": {
+                "dates": dates
+            }
+        }
+
+        return jsonify(data), 200
+
     @socketio.on('update')
     def update_socketio(data):
         app.logger.info(f"SocketIO: Update")
