@@ -114,12 +114,12 @@ def create_app():
     def update_user(user, raw_user) -> User:
         user.first_name = raw_user['first_name']
         user.last_name = raw_user['last_name']
-        user.avatar = raw_user['avatar']
-        user.avatar_hd = raw_user['avatar_hd']
-        user.total_badges = raw_user['total_badges']
-        user.total_friends = raw_user['total_friends']
-        user.total_checkins = raw_user['total_checkins']
-        user.total_beers = raw_user['total_beers']
+        user.avatar = raw_user['user_avatar']
+        user.avatar_hd = raw_user['user_avatar_hd']
+        user.total_badges = raw_user['stats']['total_badges']
+        user.total_friends = raw_user['stats']['total_friends']
+        user.total_checkins = raw_user['stats']['total_checkins']
+        user.total_beers = raw_user['stats']['total_beers']
 
         db.session.commit()
         return user
