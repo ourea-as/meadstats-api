@@ -525,19 +525,21 @@ def create_app():
     @app.route('/v1/users/<string:username>/graph')
     def get_graph_for_username(username: str):
         user = get_user_from_db(username)
-        checkins = Checkin.query.filter_by(user=user).all()
+        checkins = Checkin.query.filter_by(user=user).order_by(Checkin.first_had.asc()).all()
 
         dates = []
+        sum = 0
 
         for checkin in checkins:
             date = f'{checkin.first_had.year}/{checkin.first_had.month}/{checkin.first_had.day}'
+            sum += 1
 
             for x in dates:
                 if x['date'] == date:
-                    x['count'] += 1
+                    x['count'] = sum
                     break
             else:
-                x = {'date': date, 'count': 1}
+                x = {'date': date, 'count': sum}
 
                 dates.append(x)
 
