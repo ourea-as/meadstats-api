@@ -581,6 +581,10 @@ def create_app():
                 if not update_from_offset(offset, beer_count, username, access_token, user):
                     break
 
+            user.last_update = datetime.datetime.utcnow()
+            print(user.last_update)
+            db.session.commit()
+
             socketio.emit('update:finished', {'finished': True})
             app.logger.info(f"SocketIO: Finished")
             socketio.sleep(0)

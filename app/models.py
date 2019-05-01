@@ -1,3 +1,5 @@
+import datetime
+
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import fields
@@ -21,6 +23,7 @@ class User(db.Model):
     total_beers = db.Column(db.Integer)
     access_token = db.Column(db.String(200))
     api_request_count = db.Column(db.Integer)
+    last_update = db.Column(db.DateTime(timezone=False))
 
     def __init__(self, id, user_name, first_name, last_name, avatar, avatar_hd, total_badges, total_friends, total_checkins, total_beers, access_token, api_request_count):
         self.id = id
@@ -35,12 +38,13 @@ class User(db.Model):
         self.total_beers = total_beers
         self.access_token = access_token
         self.api_request_count = api_request_count
+        self.last_update = datetime.datetime.utcnow()
 
 
 class UserSchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('id', 'user_name', 'first_name', 'last_name', 'avatar', 'avatar_hd', 'total_badges', 'total_friends', 'total_checkins', 'total_beers')
+        fields = ('id', 'user_name', 'first_name', 'last_name', 'avatar', 'avatar_hd', 'total_badges', 'total_friends', 'total_checkins', 'total_beers', 'last_update')
 
 
 user_schema = UserSchema()
