@@ -61,6 +61,7 @@ class UserSchema(ma.Schema):
 
 
 user_schema = UserSchema()
+users_schema = UserSchema(many=True)
 
 
 class Friendship(db.Model):
@@ -80,6 +81,18 @@ class Friendship(db.Model):
         self.user1 = user1
         self.user2 = user2
 
+
+class FriendshipSchema(ma.Schema):
+    user1 = fields.Nested('UserSchema')
+    user2 = fields.Nested('UserSchema')
+
+    class Meta:
+        # Fields to expose
+        fields = ('user1', 'user2')
+
+
+friendship_schema = FriendshipSchema()
+friendships_schema = FriendshipSchema(many=True)
 
 class Brewery(db.Model):
     __tablename__ = 'breweries'

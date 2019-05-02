@@ -10,10 +10,10 @@ from flask_jwt_extended import (JWTManager, create_access_token, decode_token)
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from requests import HTTPError
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from .untappd_api import UntappdAPI
-from .models import db, ma, User, user_schema, Checkin, checkins_schema, Beer, beer_schema, checkin_schema, Brewery, Venue, Friendship
+from .models import db, ma, User, user_schema, users_schema, Checkin, checkins_schema, Beer, beer_schema, checkin_schema, Brewery, Venue, Friendship, friendships_schema
 
 
 def create_app():
@@ -206,7 +206,23 @@ def create_app():
 
         return jsonify(data), 200
 
-    def get_user_from_db(username: str):
+    @app.route('/v1/users/<string:username>/friends')
+    def get_user_friends(username: str):
+        user = get_user_from_db(username)
+
+        friendships = Friendship.query.filter(or_(Friendship.user1 == user, Friendship.user2 == user)).options(db.joinedload(Friendship.user1)).options(db.joinedload(Friendship.user2)).all()
+        friends = [friendship.user2 if friendship.user1 == user else friendship.user1 for friendship in friendships]
+
+        data = {
+            "status": "success",
+            "data": {
+                "friends": users_schema.dump(friends)[0]
+            }
+        }
+
+        return jsonify(data), 200
+
+    def get_user_from_db(username: str) -> User:
         return User.query.filter(func.lower(User.user_name) == func.lower(username)).first()
 
     def contains(list, filter):
