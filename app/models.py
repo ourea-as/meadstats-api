@@ -25,7 +25,19 @@ class User(db.Model):
     api_request_count = db.Column(db.Integer)
     last_update = db.Column(db.DateTime(timezone=False))
 
-    def __init__(self, id, user_name, first_name, last_name, avatar, avatar_hd, total_badges, total_friends, total_checkins, total_beers, access_token, api_request_count):
+    def __init__(self,
+                 id: int,
+                 user_name: str,
+                 first_name: str,
+                 last_name: str,
+                 avatar: str,
+                 avatar_hd: str,
+                 total_badges: int,
+                 total_friends: int,
+                 total_checkins: int,
+                 total_beers: int,
+                 access_token: str,
+                 api_request_count: int):
         self.id = id
         self.user_name = user_name
         self.first_name = first_name
@@ -38,24 +50,35 @@ class User(db.Model):
         self.total_beers = total_beers
         self.access_token = access_token
         self.api_request_count = api_request_count
-        self.last_update = datetime.datetime.utcnow()
 
 
 class UserSchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ('id', 'user_name', 'first_name', 'last_name', 'avatar', 'avatar_hd', 'total_badges', 'total_friends', 'total_checkins', 'total_beers', 'last_update')
+        fields = ('id', 'user_name', 'first_name', 'last_name', 'avatar',
+                  'avatar_hd', 'total_badges', 'total_friends',
+                  'total_checkins', 'total_beers', 'last_update')
 
 
 user_schema = UserSchema()
 
 
-# class Friendship(db.Model):
-#     hash = db.Column(db.Integer, primary_key=True)
-#     user1_id = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False)
-#     user1 = db.relationship('User', backref=db.backref('checkins', lazy=True))
-#     user2_id = db.Column(db.Integer, db.ForeignKey('user.uid'), nullable=False)
-#     user2 = db.relationship('User', backref=db.backref('checkins', lazy=True))
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+
+    hash = db.Column(db.String(80), primary_key=True)
+    user1_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user1 = db.relationship('User', foreign_keys=[user1_id])
+    user2_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user2 = db.relationship('User', foreign_keys=[user2_id])
+
+    def __init__(self,
+                 hash: str,
+                 user1: User,
+                 user2: User):
+        self.hash = hash
+        self.user1 = user1
+        self.user2 = user2
 
 
 class Brewery(db.Model):

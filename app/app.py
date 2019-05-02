@@ -13,7 +13,7 @@ from requests import HTTPError
 from sqlalchemy import func
 
 from .untappd_api import UntappdAPI
-from .models import db, ma, User, user_schema, Checkin, checkins_schema, Beer, beer_schema, checkin_schema, Brewery, Venue
+from .models import db, ma, User, user_schema, Checkin, checkins_schema, Beer, beer_schema, checkin_schema, Brewery, Venue, Friendship
 
 
 def create_app():
@@ -578,7 +578,13 @@ def create_app():
             beer_count = user.total_beers
 
             for offset in range(0, beer_count, 50):
-                if not update_from_offset(offset, beer_count, username, access_token, user):
+                if not update_beers_from_offset(offset, beer_count, username, access_token, user):
+                    break
+
+            friend_count = user.total_friends
+
+            for offset in range(0, friend_count, 50):
+                if not update_friends_from_offset(offset, friend_count, username, access_token, user):
                     break
 
             user.last_update = datetime.datetime.utcnow()
@@ -589,9 +595,9 @@ def create_app():
             app.logger.info(f"SocketIO: Finished")
             socketio.sleep(0)
 
-    def update_from_offset(offset, beer_count, username, access_token, user):
+    def update_beers_from_offset(offset, beer_count, username, access_token, user):
         socketio.emit('update:progress', {
-                      'progress': offset, 'total': beer_count})
+                      'progress': offset, 'total': beer_count, 'action': 'checkins'})
         app.logger.info(f"SocketIO: Progress ({offset}/{beer_count})")
         socketio.sleep(0)
 
@@ -638,6 +644,60 @@ def create_app():
                               first_had=first_had)
 
             db.session.add(checkin)
+            db.session.commit()
+        else:
+            return False
+        return True
+
+    def update_friends_from_offset(offset, friend_count, username, access_token, user):
+        socketio.emit('update:progress', {
+                      'progress': offset, 'total': friend_count, 'action': 'friends'})
+        app.logger.info(f"SocketIO: Progress ({offset}/{friend_count})")
+        socketio.sleep(0)
+
+        try:
+            friends_add, _ = untappd_api.user_friends(
+                username, offset, 50, access_token)
+            friends = friends_add['items']
+        except:
+            return False
+
+        for raw_friend in friends:
+            if not handle_friend(raw_friend, user):
+                return False
+
+        return True
+
+    def handle_friend(raw_friend, user):
+        friend = User.query.filter_by(
+            id=raw_friend['user']['uid']).first()
+
+        if friend is None:
+            friend = User(id=raw_friend['user']['uid'],
+                          user_name=raw_friend['user']['user_name'],
+                          first_name=raw_friend['user']['first_name'],
+                          last_name=raw_friend['user']['last_name'],
+                          avatar=raw_friend['user']['user_avatar'],
+                          avatar_hd=raw_friend['user']['user_avatar'],  # Will be overwritten if user is updated
+                          total_badges=0,
+                          total_friends=0,
+                          total_checkins=0,
+                          total_beers=0,
+                          access_token="",
+                          api_request_count=0)
+
+            db.session.add(friend)
+            db.session.commit()
+
+        friendship = Friendship.query.filter_by(
+            hash=raw_friend['friendship_hash']).first()
+
+        if friendship is None:
+            friendship = Friendship(hash=raw_friend['friendship_hash'],
+                                    user1=user,
+                                    user2=friend)
+
+            db.session.add(friendship)
             db.session.commit()
         else:
             return False

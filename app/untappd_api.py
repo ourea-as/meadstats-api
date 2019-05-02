@@ -93,9 +93,38 @@ class UntappdAPI:
 
         return response_json['response']['user'], response
 
+    def user_friends(self,
+                     username: str = None,
+                     offset: int = 0,
+                     limit: int = 50,
+                     access_token: str = None):
+        """
+        Returns list of users friends
+        :param username: Username of user
+        :param offset: Get friends starting from this number
+        :param limit: Number of friends to get from offset. Max: 50
+        :param access_token: Optionally pass a access_token if no username is provided
+        :return: JSON data
+        """
+        if username:
+            method = 'user/friends/{}'.format(username)
+        else:
+            if access_token:
+                method = 'user/friends'
+            else:
+                raise Exception('Access token need to be provided if username is None')
+
+        params = {'offset': offset, 'limit': limit}
+
+        response = self._do_get(method, params, access_token)
+        response_json = response.json()
+        logger.info(f'Response JSON: {response_json}')
+
+        return response_json['response'], response
+
     def user_beers(self, username: str = None, offset: int = 0, limit: int = 50, access_token: str = None):
         """
-        Returns information about a user
+        Returns list of users beer
         :param username: Username of user
         :param offset: Get beers starting from this number
         :param limit: Number of beers to get from offset. Max: 50
