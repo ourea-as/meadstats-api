@@ -10,7 +10,7 @@ from flask_jwt_extended import (JWTManager, create_access_token, decode_token)
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from requests import HTTPError
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 
 from .untappd_api import UntappdAPI
 from .models import db, ma, User, user_schema, users_schema, Checkin, checkins_schema, Beer, beer_schema, checkin_schema, Brewery, Venue, Friendship, friendships_schema
@@ -705,8 +705,7 @@ def create_app():
             db.session.add(friend)
             db.session.commit()
 
-        friendship = Friendship.query.filter_by(
-            hash=raw_friend['friendship_hash']).first()
+        friendship = Friendship.query.filter(or_(and_(Friendship.user1 == user, Friendship.user2 == friend), and_(Friendship.user2 == user, Friendship.user1 == friend))).first()
 
         if friendship is None:
             friendship = Friendship(hash=raw_friend['friendship_hash'],
@@ -715,8 +714,7 @@ def create_app():
 
             db.session.add(friendship)
             db.session.commit()
-        else:
-            return False
+
         return True
 
     return app
