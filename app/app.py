@@ -42,6 +42,10 @@ def create_app():
     untappd_api = UntappdAPI(app.config['UNTAPPD_CLIENT_ID'],
                              app.config['UNTAPPD_CLIENT_SECRET'])
 
+    @app.route('/')
+    def status():
+        return 'Healthy', 200
+
     @app.route('/auth_callback')
     def auth_callback():
         """
