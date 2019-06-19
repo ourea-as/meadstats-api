@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: meadstats-api-staging
+spec:
+  selector:
+    app: meadstats-api-staging
+  ports:
+  - port: 80
+    targetPort: 8000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: meadstats-api-staging-ingress
+  annotations:  
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - staging.api.meadstats.com
+    secretName: meadstats-api-staging-cert
+  rules:
+    - host: staging.api.meadstats.com
+      http:
+        paths:
+        - backend:
+            serviceName: meadstats-api-staging
+            servicePort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meadstats-staging-api-deployment
+  labels:
+    app: meadstats-staging-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: meadstats-staging-api
+  template:
+    metadata:
+      labels:
+        app: meadstats-staging-api
+    spec:
+      containers:
+      - name: meadstats-staging-api
+        image: registry.bore.ai/meadstats-api:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          periodSeconds: 30
+          timeoutSeconds: 1
+          initialDelaySeconds: 10
+        ports:
+        - containerPort: 8000
+      imagePullSecrets:
+      - name: regcred
