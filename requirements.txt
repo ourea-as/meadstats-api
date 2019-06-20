@@ -9,7 +9,7 @@ Flask-SocketIO==4.1.0
 Flask-SQLAlchemy==2.4.0
 gunicorn==19.9.0
 marshmallow-sqlalchemy==0.16.4
-psycopg2==2.8.2
+psycopg2==2.8.3
 pycountry==18.12.8
 python-dotenv==0.10.3
 requests==2.22.0
