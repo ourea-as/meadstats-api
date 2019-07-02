@@ -335,7 +335,8 @@ def create_app():
                     'ratings': [checkin.rating],
                     'location': {
                         'lat': brewery.latitude,
-                        'lon': brewery.longitude
+                        'lon': brewery.longitude,
+                        'state': brewery.state
                     },
                     'label': brewery.label,
                     'name': brewery.name,
