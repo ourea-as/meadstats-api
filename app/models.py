@@ -177,7 +177,7 @@ class BeerSchema(ma.Schema):
 
     class Meta:
         # Fields to expose
-        fields = ('id', 'name', 'label', 'rating', 'abv', 'style')
+        fields = ('id', 'name', 'label', 'rating', 'abv', 'style', 'brewery')
 
 
 beer_schema = BeerSchema()
