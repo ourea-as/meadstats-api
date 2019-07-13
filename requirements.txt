@@ -1,5 +1,5 @@
 eventlet==0.25.0
-Flask==1.1.0
+Flask==1.1.1
 Flask-Cors==3.0.8
 Flask-JWT-Extended==3.20.0
 flask-marshmallow==0.10.1
