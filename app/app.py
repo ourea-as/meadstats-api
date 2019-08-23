@@ -220,7 +220,7 @@ def create_app():
         data = {
             "status": "success",
             "data": {
-                "friends": users_schema.dump(friends)[0]
+                "friends": users_schema.dump(friends)
             }
         }
 
@@ -254,7 +254,7 @@ def create_app():
             for x in countries:
                 if x['name'] == country:
                     x['count'] += 1
-                    x['beers'].append(checkin_schema.dump(checkin).data)
+                    x['beers'].append(checkin_schema.dump(checkin))
                     break
             else:
                 country_code = get_country_code(original_country).upper()
@@ -264,7 +264,7 @@ def create_app():
 
                 x = {'name': country, 'count': 1, 'beers': [],
                      'code': country_code}
-                x['beers'].append(checkin_schema.dump(checkin).data)
+                x['beers'].append(checkin_schema.dump(checkin))
 
                 countries.append(x)
 
@@ -317,7 +317,7 @@ def create_app():
             count += 1
             ratings.append(checkin.rating)
 
-            beer = beer_schema.dump(beer, many=False)[0]
+            beer = beer_schema.dump(beer, many=False)
             beer['userRating'] = checkin.rating
             beer['firstHad'] = checkin.first_had
             beer['count'] = checkin.count
