@@ -35,7 +35,7 @@ def create_app():
 
     db.init_app(app)
     ma.init_app(app)
-    socketio = SocketIO(app)
+    socketio = SocketIO(app, cors_allowed_origins='*')
     jwt = JWTManager(app)
     CORS(app)
 
