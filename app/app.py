@@ -176,6 +176,10 @@ def create_app():
         user = get_user_from_db(username)
 
         if user:
+            print(user)
+            userdata = user_schema.dump(user, many=False)
+            print(userdata)
+
             data = {
                 "status": "success",
                 "data": {
