@@ -8,7 +8,7 @@ Flask-Script==2.0.6
 Flask-SocketIO==4.2.1
 Flask-SQLAlchemy==2.4.0
 gunicorn==19.9.0
-marshmallow-sqlalchemy==0.17.1
+marshmallow-sqlalchemy==0.17.2
 psycopg2==2.8.3
 pycountry==18.12.8
 python-dotenv==0.10.3
