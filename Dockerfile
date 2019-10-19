@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.8-alpine
 MAINTAINER Fredrik Bore <fredrik@bore.ai>
 
 WORKDIR /app
