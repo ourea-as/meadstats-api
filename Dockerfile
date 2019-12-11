@@ -11,7 +11,7 @@ EXPOSE 8000
 COPY ./requirements.txt /app/requirements.txt
 
 RUN apk add --no-cache --virtual .build-deps \
-  build-base postgresql-dev \
+  build-base postgresql-dev libffi-dev \
     && pip install -r requirements.txt \
     && find /usr/local \
         \( -type d -a -name test -o -name tests \) \
