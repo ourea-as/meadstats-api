@@ -181,6 +181,7 @@ class BeerSchema(ma.Schema):
 
 
 beer_schema = BeerSchema()
+beers_schema = BeerSchema(many=True)
 
 
 class Checkin(db.Model):
