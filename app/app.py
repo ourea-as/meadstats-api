@@ -1,12 +1,20 @@
 import datetime
+from datetime import timedelta
 import json
 import logging
 import os
 from statistics import mean
 
 import pycountry
-from flask import Flask, request, jsonify, redirect, make_response
-from flask_jwt_extended import JWTManager, create_access_token, decode_token
+from flask import Flask, request, jsonify, redirect, make_response, Response
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    decode_token,
+    jwt_required,
+    get_jwt_identity,
+    get_raw_jwt,
+)
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from requests import HTTPError
@@ -218,18 +226,26 @@ def create_app():
 
             return jsonify(data), 404
 
-    @app.route("/v1/tasting/users/<string:ids>")
-    def get_tasting_users(ids: str):
+    @app.route("/v1/tasting/users")
+    def get_tasting_users():
+        ids = request.args.get("users")
         ids_arr = ids.split(",")
+        if len(ids_arr) == 0 or ids == "":
+            return jsonify({"status": "success"}), 200
+
         users = User.query.filter(User.id.in_(ids_arr)).all()
 
         data = {"status": "success", "data": {"users": users_schema.dump(users)}}
 
         return jsonify(data), 200
 
-    @app.route("/v1/tasting/beers/<string:ids>")
-    def get_tasting_beers(ids: str):
+    @app.route("/v1/tasting/beers")
+    def get_tasting_beers():
+        ids = request.args.get("beers")
         ids_arr = ids.split(",")
+        if len(ids_arr) == 0 or ids == "":
+            return jsonify({"status": "success"}), 200
+
         beers = Beer.query.filter(Beer.id.in_(ids_arr)).all()
 
         data = {"status": "success", "data": {"beers": beers_schema.dump(beers)}}
@@ -244,9 +260,13 @@ def create_app():
         beers = request.args.get("beers")
         beerids_arr = beers.split(",")
 
+        if len(beerids_arr) == 0 or len(userids_arr) == 0 or users == "" or beers == "":
+            return jsonify({"status": "success"}), 200
+
         checkins = (
             Checkin.query.filter(Checkin.beer_id.in_(beerids_arr))
             .filter(Checkin.user_id.in_(userids_arr))
+            .filter((Checkin.first_had + timedelta(days=1)) > datetime.datetime.now())
             .all()
         )
 
@@ -689,6 +709,40 @@ def create_app():
                 return False
 
         return True
+
+    @app.route("/v1/tasting/updateUsers")
+    @jwt_required
+    def tasting_updateusers():
+        current_user = get_jwt_identity()
+
+        if current_user != "Boren":
+            return Response("Unauthorized", 401)
+
+        users = request.args.get("users")
+        ids_arr = users.split(",")
+        users = User.query.filter(User.id.in_(ids_arr)).all()
+
+        updated = False
+        missing = []
+
+        for user in users:
+            if user.access_token:
+                print(f"Updating {user.user_name}")
+                beers_add, _ = untappd_api.user_beers(
+                    user.user_name, 0, 50, user.access_token
+                )
+                beers = beers_add["items"]
+
+                for raw_beer in beers:
+                    if not handle_beer(raw_beer, user):
+                        break
+                    else:
+                        updated = True
+            else:
+                missing.append(user.user_name)
+                print(f"{user.user_name} does not have a access token")
+
+        return jsonify({"updated": updated, "missing": missing}), 200
 
     def handle_beer(raw_beer, user):
         brewery = Brewery.query.filter_by(id=raw_beer["brewery"]["brewery_id"]).first()
