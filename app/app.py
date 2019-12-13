@@ -218,8 +218,8 @@ def create_app():
 
             return jsonify(data), 404
 
-    @app.route("/v1/users/list/<string:ids>")
-    def get_users(ids: str):
+    @app.route("/v1/tasting/users/<string:ids>")
+    def get_tasting_users(ids: str):
         ids_arr = ids.split(",")
         users = User.query.filter(User.id.in_(ids_arr)).all()
 
@@ -227,12 +227,33 @@ def create_app():
 
         return jsonify(data), 200
 
-    @app.route("/v1/beers/list/<string:ids>")
-    def get_beers(ids: str):
+    @app.route("/v1/tasting/beers/<string:ids>")
+    def get_tasting_beers(ids: str):
         ids_arr = ids.split(",")
         beers = Beer.query.filter(Beer.id.in_(ids_arr)).all()
 
         data = {"status": "success", "data": {"beers": beers_schema.dump(beers)}}
+
+        return jsonify(data), 200
+
+    @app.route("/v1/tasting/checkins")
+    def get_tasting_checkins():
+        users = request.args.get("users")
+        userids_arr = users.split(",")
+
+        beers = request.args.get("beers")
+        beerids_arr = beers.split(",")
+
+        checkins = (
+            Checkin.query.filter(Checkin.beer_id.in_(beerids_arr))
+            .filter(Checkin.user_id.in_(userids_arr))
+            .all()
+        )
+
+        data = {
+            "status": "success",
+            "data": {"checkins": checkins_schema.dump(checkins)},
+        }
 
         return jsonify(data), 200
 

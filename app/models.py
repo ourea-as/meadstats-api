@@ -207,6 +207,7 @@ class Checkin(db.Model):
 
 class CheckinSchema(ma.Schema):
     beer = fields.Nested('BeerSchema')
+    user = fields.Nested('UserSchema')
 
     class Meta:
         fields = ('id', 'beer', 'user', 'count', 'rating', 'first_had')
