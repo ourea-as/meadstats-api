@@ -13,5 +13,5 @@ marshmallow-sqlalchemy==0.21.0
 psycopg2==2.8.4
 pycountry==19.8.18
 pyopenssl==19.1.0
-python-dotenv==0.10.5
+python-dotenv==0.12.0
 requests==2.23.0
