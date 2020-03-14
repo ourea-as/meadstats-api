@@ -632,9 +632,10 @@ def create_app():
             for x in dates:
                 if x["date"] == date:
                     x["count"] = sum
+                    x["countDay"] = x["countDay"] + 1
                     break
             else:
-                x = {"date": date, "count": sum}
+                x = {"date": date, "count": sum, "countDay": 1}
 
                 dates.append(x)
 
