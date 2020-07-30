@@ -11,7 +11,7 @@ gunicorn==20.0.4
 marshmallow==3.7.1
 marshmallow-sqlalchemy==0.22.3
 psycopg2==2.8.5
-pycountry==19.8.18
+pycountry==20.7.3
 pyopenssl==19.1.0
 python-dotenv==0.14.0
 requests==2.24.0
