@@ -183,6 +183,15 @@ class BeerSchema(ma.Schema):
 beer_schema = BeerSchema()
 beers_schema = BeerSchema(many=True)
 
+class ShallowBeerSchema(ma.Schema):
+    class Meta:
+        # Fields to expose
+        fields = ('id', 'name', 'label', 'rating', 'abv', 'style')
+
+
+shallow_beer_schema = ShallowBeerSchema()
+shallow_beers_schema = ShallowBeerSchema(many=True)
+
 
 class Checkin(db.Model):
     __tablename__ = 'checkins'
@@ -215,6 +224,16 @@ class CheckinSchema(ma.Schema):
 
 checkin_schema = CheckinSchema()
 checkins_schema = CheckinSchema(many=True)
+
+class ShallowCheckinSchema(ma.Schema):
+    beer = fields.Nested('ShallowBeerSchema')
+
+    class Meta:
+        fields = ('id', 'beer', 'count', 'rating', 'first_had')
+
+
+shallow_checkin_schema = ShallowCheckinSchema()
+shallow_checkins_schema = ShallowCheckinSchema(many=True)
 
 
 class Badge(db.Model):

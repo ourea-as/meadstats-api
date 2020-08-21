@@ -33,6 +33,7 @@ from .models import (
     beer_schema,
     beers_schema,
     checkin_schema,
+    shallow_checkins_schema,
     Brewery,
     Venue,
     Friendship,
@@ -48,6 +49,7 @@ def create_app():
     app.logger.setLevel(gunicorn_logger.level)
 
     # Load config
+
     if os.getenv("FLASK_ENV") == "development":
         app.config.from_object("app.config.DevelopmentConfig")
     elif os.getenv("FLASK_ENV") == "production":
@@ -279,13 +281,17 @@ def create_app():
 
     @app.route("/v1/users/<string:username>/checkins")
     def get_user_checkins(username: str):
-        checkins = Checkin.query.filter(
-            func.lower(Checkin.user_name) == func.lower(username)
-        ).all()
+        user = get_user_from_db(username)
+
+        checkins = (
+            Checkin.query.options(db.joinedload(Checkin.beer))
+            .filter(Checkin.user == user)
+            .all()
+        )
 
         data = {
             "status": "success",
-            "data": {"checkins": checkins_schema.dump(checkins)},
+            "data": {"checkins": shallow_checkins_schema.dump(checkins)},
         }
 
         return jsonify(data), 200
