@@ -467,6 +467,7 @@ def create_app():
 
     # Needed to map some country names not adhering to ISO
     COUNTRY_CODE_MAPPING_TABLE = {
+        "Aland Islands": "ax",
         "Bolivia": "bo",
         "China / People's Republic of China": "cn",
         "England": "gb",
@@ -683,14 +684,13 @@ def create_app():
 
             friend_count = user.total_friends
 
-            for offset in range(0, friend_count, 50):
+            for offset in range(0, friend_count, 25):
                 if not update_friends_from_offset(
                     offset, friend_count, username, access_token, user
                 ):
                     break
 
             user.last_update = datetime.datetime.utcnow()
-            print(user.last_update)
             db.session.commit()
 
             socketio.emit("update:finished", {"finished": True})
@@ -816,7 +816,7 @@ def create_app():
                 id=raw_friend["user"]["uid"],
                 user_name=raw_friend["user"]["user_name"],
                 first_name=raw_friend["user"]["first_name"],
-                last_name=raw_friend["user"]["last_name"],
+                last_name=raw_friend["user"]["last_name"][0],
                 avatar=raw_friend["user"]["user_avatar"],
                 avatar_hd=raw_friend["user"][
                     "user_avatar"
