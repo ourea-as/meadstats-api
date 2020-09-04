@@ -301,12 +301,17 @@ def create_app():
         user = get_user_from_db(username)
 
         friendships = (
-            Friendship.query.filter(Friendship.user1 == user)
+            Friendship.query.filter(
+                or_(Friendship.user1 == user, Friendship.user2 == user)
+            )
             .options(db.joinedload(Friendship.user1))
             .options(db.joinedload(Friendship.user2))
             .all()
         )
-        friends = [friendship.user2 for friendship in friendships]
+        friends = [
+            friendship.user2 if friendship.user1 == user else friendship.user1
+            for friendship in friendships
+        ]
 
         data = {"status": "success", "data": {"friends": users_schema.dump(friends)}}
 
@@ -462,7 +467,6 @@ def create_app():
 
     # Needed to map some country names not adhering to ISO
     COUNTRY_CODE_MAPPING_TABLE = {
-        "Aland Islands": "ax",
         "Bolivia": "bo",
         "China / People's Republic of China": "cn",
         "England": "gb",
@@ -829,7 +833,10 @@ def create_app():
             db.session.commit()
 
         friendship = Friendship.query.filter(
-            Friendship.user1 == user, Friendship.user2 == friend
+            or_(
+                and_(Friendship.user1 == user, Friendship.user2 == friend),
+                and_(Friendship.user2 == user, Friendship.user1 == friend),
+            )
         ).first()
 
         if friendship is None:
