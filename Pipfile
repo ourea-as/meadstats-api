@@ -24,7 +24,7 @@ Flask-Migrate = "==2.5.3"
 Flask-Script = "==2.0.6"
 Flask-SocketIO = "==4.3.1"
 Flask-SQLAlchemy = "==2.4.4"
-pyOpenSSL = "==19.1.0"
+pyOpenSSL = "==22.0.0"
 
 [requires]
 python_version = "3.8"
