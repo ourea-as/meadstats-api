@@ -9,7 +9,7 @@ EXPOSE 8000
 # Convert pipenv to requirements.txt
 RUN pip install pipenv
 COPY Pipfile* /tmp/
-RUN cd /tmp && pipenv lock --requirements > /app/requirements.txt
+RUN cd /tmp && pipenv requirements > /app/requirements.txt
 
 # Install dependencies
 RUN apk add --no-cache --virtual .build-deps \
