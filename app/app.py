@@ -5,6 +5,9 @@ import logging
 import os
 from statistics import mean
 
+
+from flask_migrate import Migrate
+
 import pycountry
 from flask import Flask, request, jsonify, redirect, make_response, Response
 from flask_jwt_extended import (
@@ -62,6 +65,8 @@ def create_app():
     socketio = SocketIO(app, cors_allowed_origins="*")
     jwt = JWTManager(app)
     CORS(app)
+
+    migrate = Migrate(app, db)
 
     untappd_api = UntappdAPI(
         app.config["UNTAPPD_CLIENT_ID"], app.config["UNTAPPD_CLIENT_SECRET"]
@@ -495,7 +500,6 @@ def create_app():
     }
 
     def get_country_code(country: str):
-
         if COUNTRY_CODE_MAPPING_TABLE.get(country):
             return COUNTRY_CODE_MAPPING_TABLE.get(country)
 

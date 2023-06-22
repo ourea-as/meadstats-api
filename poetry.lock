@@ -490,19 +490,6 @@ Flask = ">=0.9"
 Flask-SQLAlchemy = ">=1.0"
 
 [[package]]
-name = "flask-script"
-version = "2.0.6"
-description = "Scripting support for Flask"
-optional = false
-python-versions = "*"
-files = [
-    {file = "Flask-Script-2.0.6.tar.gz", hash = "sha256:6425963d91054cfcc185807141c7314a9c5ad46325911bd24dcb489bd0161c65"},
-]
-
-[package.dependencies]
-Flask = "*"
-
-[[package]]
 name = "flask-socketio"
 version = "5.3.4"
 description = "Socket.IO integration for Flask applications"
@@ -1376,4 +1363,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "19b10d0876491a0e236a672d456b8264bc369f9fb5febd665228bca535af4a31"
+content-hash = "20213a483054be55468957604ef3aa104dd3afc9fd33b0b8dde445761b36c3cb"
