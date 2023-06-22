@@ -1,13 +1,13 @@
-[[source]]
-name = "pypi"
-url = "https://pypi.org/simple"
-verify_ssl = true
+[tool.poetry]
+name = "meadstats-api"
+version = "0.1.0"
+description = ""
+authors = ["Fredrik Bore <fredrik@bore.ai>"]
+readme = "README.md"
+packages = [{include = "meadstats_api"}]
 
-[dev-packages]
-pylint = "*"
-black = "*"
-
-[packages]
+[tool.poetry.dependencies]
+python = "^3.11"
 eventlet = "==0.27.0"
 flask-marshmallow = "==0.13.0"
 gunicorn = "==20.0.4"
@@ -26,8 +26,10 @@ Flask-SocketIO = "==4.3.1"
 Flask-SQLAlchemy = "==2.4.4"
 pyOpenSSL = "==19.1.0"
 
-[requires]
-python_version = "3.8"
 
-[pipenv]
-allow_prereleases = true
+[tool.poetry.group.dev.dependencies]
+pylint = "*"
+black = "*"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
