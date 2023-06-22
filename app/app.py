@@ -13,7 +13,6 @@ from flask_jwt_extended import (
     decode_token,
     jwt_required,
     get_jwt_identity,
-    get_raw_jwt,
 )
 from flask_cors import CORS
 from flask_socketio import SocketIO
