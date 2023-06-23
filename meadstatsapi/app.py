@@ -683,10 +683,10 @@ def update_socketio(data):
     # Authenticate user
     # TODO: Error check
     decoded_token = decode_token(data["token"])
-    if "identity" not in decoded_token:
+    if "sub" not in decoded_token:
         app.logger.error(f"SocketIO: Missing identity in token")
         return
-    user = decoded_token["identity"]
+    user = decoded_token["sub"]
     username = data["username"]
 
     if user:
