@@ -357,7 +357,7 @@ def get_user_countries(username: str):
 
     countries = []
 
-    with open("app/map.json") as f:
+    with open("meadstatsapi/map.json") as f:
         data = json.load(f)
         countryData = data["objects"]["units"]["geometries"]
 
