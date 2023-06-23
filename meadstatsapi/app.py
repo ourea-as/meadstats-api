@@ -51,12 +51,12 @@ app.logger.setLevel(gunicorn_logger.level)
 # Load config
 
 if os.getenv("FLASK_ENV") == "development":
-    app.config.from_object("app.config.DevelopmentConfig")
+    app.config.from_object("meadstatsapi.config.DevelopmentConfig")
 elif os.getenv("FLASK_ENV") == "production":
-    app.config.from_object("app.config.ProductionConfig")
+    app.config.from_object("meadstatsapi.config.ProductionConfig")
 else:
     app.logger.warn("No configuration specified. Falling back to production")
-    app.config.from_object("app.config.ProductionConfig")
+    app.config.from_object("meadstatsapi.config.ProductionConfig")
 
 db.init_app(app)
 ma.init_app(app)
