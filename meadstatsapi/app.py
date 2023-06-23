@@ -713,13 +713,13 @@ def update_socketio(data):
             ):
                 break
 
-        friend_count = user.total_friends
+        # friend_count = user.total_friends
 
-        for offset in range(0, friend_count, 25):
-            if not update_friends_from_offset(
-                offset, friend_count, username, access_token, user
-            ):
-                break
+        # for offset in range(0, friend_count, 25):
+        #    if not update_friends_from_offset(
+        #        offset, friend_count, username, access_token, user
+        #    ):
+        #        break
 
         user.last_update = datetime.datetime.utcnow()
         db.session.commit()
