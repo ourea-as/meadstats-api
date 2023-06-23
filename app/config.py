@@ -7,6 +7,7 @@ class BaseConfig:
     """Base configuration"""
 
     TESTING = False
+    PORT = os.environ.get("PORT", 5000)
 
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET")
     JWT_ACCESS_TOKEN_EXPIRES = False
@@ -34,3 +35,4 @@ class ProductionConfig(BaseConfig):
 
     DEBUG = False
     SQLALCHEMY_ECHO = False
+    PORT = os.environ.get("PORT", 80)
