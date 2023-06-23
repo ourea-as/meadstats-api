@@ -44,9 +44,12 @@ from .models import (
 
 app = Flask(__name__, instance_relative_config=True)
 
-gunicorn_logger = logging.getLogger("gunicorn.error")
-app.logger.handlers = gunicorn_logger.handlers
-app.logger.setLevel(gunicorn_logger.level)
+# Enable info logging
+logging.basicConfig(level=logging.INFO)
+
+# gunicorn_logger = logging.getLogger("gunicorn.error")
+# app.logger.handlers = gunicorn_logger.handlers
+# app.logger.setLevel(gunicorn_logger.level)
 
 # Load config
 
