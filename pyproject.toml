@@ -29,7 +29,7 @@
 
     [tool.poetry.group.dev.dependencies]
         black  = "^23.3.0"
-        pylint = "^2.17.4"
+        pylint = "^2.17.7"
 
 [tool.poetry.scripts]
     meadstatsapi = "meadstatsapi.app:main"
